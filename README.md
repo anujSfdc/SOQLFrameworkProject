@@ -1,18 +1,21 @@
-# Salesforce DX Project: Next Steps
+# Dynamic DOQL Builder Class
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+# Sample Code to run
 
-## How Do You Plan to Deploy Your Changes?
+Set<string> fields = new Set<string> {'Id', 'Name', 'Phone', 'AccountNumber', 'Custom_Field__c'};
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+QueryStringFactory.isUpdateable = true;
+QueryStringFactory.FilterClauseWrapper wrap = new QueryStringFactory.FilterClauseWrapper();
+wrap.filterLogic = '({0})';
+wrap.filters = new Set<String> {'Phone != null'};
+QueryStringFactory.isRecordLocking = true;
+QueryStringFactory.isSecurityEnforced = true;
+QueryStringFactory qsf = new QueryStringFactory('Account', fields);
+qsf.addLimit(1);
+qsf.addInnerQuery(new Set<string> {'(Select Id, Name from Contacts)'});
+qsf.addWhereClause(wrap, false);
+qsf.addOffSet(0);
+string query = qsf.query();
 
-## Configure Your Salesforce DX Project
+system.debug('== Final query string '+query);
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
-
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
